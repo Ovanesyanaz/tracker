@@ -1,5 +1,12 @@
 #include "Filter.h"
 #include "Tac.h"
+#include "Track_GNN.h"
+#include "GetMeasVector.h"
+#include "ArrayController.h"
+#include "GetPredictedMeas.h"
+#include <vector>
+#include <Eigen/Dense>
+using Eigen::MatrixXd;
 class Tracker_GNN_Lite
 {
 private:
@@ -25,23 +32,114 @@ private:
     //true track deletion probability
     double trueTrackDeletionProb = 1e-5; //-3
     //gating result containers
-    //...
+    MatrixXd d2;
+    MatrixXd detS;
+    std::vector<std::vector<MatrixXd>> S;
+    // %gating thresholds
+    double gatingThresholds;
+    // %branch (track hyp) ID counter
+    int branchID = 0;
+    // %track (confirmed) ID counter
+    int trackID = 0;
+    std::vector<Track_GNN>tracks;
+    // tracks
+    // %track array controller
     Tac tac;
+    // %initial track score
+    double initScore;
+    // %track score confirmation/deletion thresholds
+    double T1;
+    double T2;
+    
     //методы
     // инициализация трекера 
     Tracker_GNN_Lite(Filter filter){
-        //применяем фильтр 
-        //заполняем фильтр нужными данными, считаем начальный score
-        //инициализируем tac - track array controller
+        //заполняем массив track_array пустыми траекториями
+        for(int i = 0; i < nTrackMax; i++){
+            Track_GNN j;
+            this->tracks.push_back(j);
+        }
+        //инициализируем tac
+        this->tac = ArrayController();
+        //получаем пороги сробирования
+        this->gatingThreasholds = GatingThreasholds();
+        // d2, detS, S
+        MatrixXd d_2(nMeasMax, nTrackMax);
+        this->d2 = d_2;
+        this->detS = this->d2;
+        std::vector<std::vector<MatrixXd>> S_1;
+        this->S = S_1;
+        //считаем начальный вес
+        this->initScore = log(this->Pd * this->betaNT / this->betaFA);
+        //пока не сделано !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        this->T1, this->T2 = 1, 2;
     };
     //главный метод - обновление 
-    void Update(){
-        //принимает t meases
+    void Update(double t, std::vector<std::vector<double>>meases){
+        //кол-во траекторий и измерений
+        int nTrk = this->tac.used;
+        int nMeas = meases.size();
+        std::vector<int> list_of_track= this->tac.list;
         //для каждой существующей траетории делаем предикт
+        for (int i : list_of_track){
+            this->tracks[i].Predict(t);
+        }
         //далее стробирование и присвоение отметок траекториям
+        //стробирование
+        std::vector<int> cInd; //индексы подтвержденных траекторий
+        std::vector<int> iInd; //инициализированных траеткорий
+        std::vector<int> tInd; //пробные траектории
+        for (int i : list_of_track){
+            //если подтвержденный
+            if (this->tracks[i].isConfirmed){
+                cInd.push_back(i);
+            }
+            //если инициатор
+            else if (this->tracks[i].score == this->initScore){
+                iInd.push_back(i);
+            }
+            //пробные траектории
+            else {
+                tInd.push_back(i);
+            }
+        }
+        //assigned meas idx
+        std::vector<bool> assignedMeasIdx(nMeas);
+        //assigned track idx
+        std::vector<bool> assignedTrackIdx(nTrk);
+        //all assignments (M2TA)       
+        std::vector<int> assigments(nMeas);
         //сопоставляем каждую отметку с каждым спрогнозируемым вектором
-        //запоминаем нормализованное расстояние между ними и определитель матрицы S
+        if ((nMeas > 0) and (nTrk > 0)){
+        //размерность вектора измерений
+            int M = 2;
+        // для каждой измерения
+            for (int i = 0; i < nMeas; i++){
+                //находим матрицу R и вектор y
+                const auto [y, R] = GetMeasVector(meases[i]);
+                //для каждой существующей траекториии
+                for (int j = 0; j < nTrk; j++){
+                    //индекс рассматриваемого трека
+                    int iTr = this->tac.list[j];
+
+                    //вектор и ков матрица траектории
+                    MatrixXd x = this->tracks[iTr].vec();
+                    MatrixXd P = this->tracks[iTr].cov();
+
+                    //вычисление предугаданного измерения и его матрицы H
+                    auto [z, H] = GetPredictedMeas(x);
+                    MatrixXd dz = y - z;
+                    //обновляем S
+                    this->S[i][j] = H * P * H.transpose() + R;
+                    //ищем расстояние
+                    this->d2(i,j) = MahalDist(dz, S[i][j]);
+                    //находим определитель S
+                    this->detS(i,j) = S[i][j].determinant();
+                }
+            }
+        }
         //далее присвоение
+        
         //сначала присваиваем отметки в подтвержденные треки
         //затем в находящиеся на подтверждении
         //и в последнюю очередь сопоставляем их в траектории с 1 отметкой (инициаторами)
