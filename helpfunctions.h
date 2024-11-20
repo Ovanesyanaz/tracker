@@ -2,7 +2,6 @@
 #define HELPFUNCTIONS_H
 
 #include <Eigen/Dense>
-#include <iostream>
 #include <cmath>
 
 using Eigen::MatrixXd;
