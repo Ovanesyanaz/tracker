@@ -16,9 +16,9 @@ private:
     std::vector<double> histTime;
 public:    
     bool isConfirmed = false;
-    int score = -1;
+    double score = -1;
     Track_GNN(){
-
+        this->score = -1;
     };
     void Predict(double t){
         this->filter.Predict();

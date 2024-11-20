@@ -5,24 +5,24 @@ using Eigen::MatrixXd;
 class Track_GNN
 {
 private:
-    int branchID = 0;
-    int trackID = 0;
-    int nLost = 0;   
-    int windowSize = 8;
+    int branchID;
+    int trackID;
+    int nLost;   
+    int windowSize;
     int measIDHist;
-    int numHist = 250;
+    int numHist;
     Filter filter;
     std::vector<MatrixXd> hist;
     std::vector<double> histTime;
 public:
     MatrixXd vec();
     MatrixXd cov();
-    int score = -1;
+    double score;
     bool isConfirmed = false;
     Track_GNN(){
     };
-    void Predict(double t){};
-    void Update(){};
-    void FillHistory(){};
-    void Update(MatrixXd meas){};
+    void Predict(double t);
+    void Update();
+    void FillHistory();
+    void Update(MatrixXd meas);
 };

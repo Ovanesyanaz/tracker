@@ -1,11 +1,15 @@
 #include "Filter.h"
 #include "Tac.h"
+#include "MahalDist.h"
 #include "Track_GNN.h"
 #include "GetMeasVector.h"
 #include "ArrayController.h"
 #include "GetPredictedMeas.h"
 #include <vector>
 #include <Eigen/Dense>
+#include <cmath>
+#include "helpfunctions.h"
+#include "assignmentoptimal.h"
 using Eigen::MatrixXd;
 class Tracker_GNN_Lite
 {
@@ -137,17 +141,75 @@ private:
                     this->detS(i,j) = S[i][j].determinant();
                 }
             }
-        }
-        //далее присвоение
-        
-        //сначала присваиваем отметки в подтвержденные треки
-        //затем в находящиеся на подтверждении
-        //и в последнюю очередь сопоставляем их в траектории с 1 отметкой (инициаторами)
+
+            // D = this.d2(1:nMeas, 1:nTrk) + log(this.detS(1:nMeas, 1:nTrk)); %log(|S|) is penalty for large covariance
+            // D = D - min(D); %cost mat must be non-zero        
+            // D(this.d2(1:nMeas, 1:nTrk) > this.gatingThresholds(M)) = inf;  %measurement validation
+            MatrixXd D = this->d2 + this->detS.array().log().matrix();
+            // вычитание минимальной цены из соответсвующих столбцов
+            // присвоение бесконечности 
+            for (int i = 0; i < D.cols(); i++){
+                double min = 1000000000;
+                for (int j = 0; j < D.rows(); j++){
+                    if (D(j,i) < min){
+                        min = D(j,i);
+                    }
+                }
+                for (int j = 0; j < D.rows(); j++){
+                    D(j,i) = D(j,i) - min;
+                    if (D(j,i) > this->gatingThresholds(M)){
+                        D(j,i) = std::numeric_limits<double>::infinity;
+                    }
+                }
+            }
+            //сначала присваиваем отметки в подтвержденные треки
+            if (cInd.size() > 0){
+                MatrixXd m2ta = assignmentoptimal(getColsMatrix(D, cInd)).first();
+                for (int i = 0; i < m2ta.rows(); i++){
+                    if (m2ta(0,i) > 0){
+                        assigments[i] = cInd[m2ta(0,i)];
+                        assignedMeasIdx[i] = true;
+                        assignedTrackIdx[cInd[m2ta(0, i)]] = true;
+                        for (int j; j < D.cols(); j++){
+                            D(i,j) = std::numeric_limits<double>::infinity;
+                        }
+                    }
+                }
+            }
+            //затем в находящиеся на подтверждении
+            if (tInd.size() > 0){
+                MatrixXd m2ta = assignmentoptimal(getColsMatrix(D, tInd)).first();
+                for (int i = 0; i < m2ta.rows(); i++){
+                    if (m2ta(i,0) > 0){
+                        assigments[i] = cInd[m2ta(0,i)];
+                        assignedMeasIdx[i] = true;
+                        assignedTrackIdx[cInd[m2ta(0, i)]] = true;
+                        for (int j; j < D.cols(); j++){
+                            D(i,j) = std::numeric_limits<double>::infinity;
+                        }
+                    }
+                }
+            }
+            //и в последнюю очередь сопоставляем их в траектории с 1 отметкой (инициаторами)
+            if (iInd.size() > 0){
+                MatrixXd m2ta = assignmentoptimal(getColsMatrix(D, iInd)).first();
+                for (int i = 0; i < m2ta.rows(); i++){
+                    if (m2ta(i,0) > 0){
+                        assigments[i] = cInd[m2ta(0,i)];
+                        assignedMeasIdx[i] = true;
+                        assignedTrackIdx[cInd[m2ta(0, i)]] = true;
+                        for (int j; j < D.cols(); j++){
+                            D(i,j) = std::numeric_limits<double>::infinity;
+                        }
+                    }
+                }
+            }
         //обновляем свойства траекторий, в которые не попали отметки исходя из их статуса
         //не присвоенные метки задают инициаторов
         //удаляем траектории с низким score
         //удаляем траектории с некоторым числом зондирований без присвоения
-        //удаляем траектории в которые давно не попадало отметок
+        //удаляем траектории в которые давно не попадало отметок   
+        }
     }
 
 };

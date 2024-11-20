@@ -4,14 +4,8 @@
 #include <iostream>
 using Eigen::MatrixXd;
 
-int MahalDist(){
-    MatrixXd a(2,2);
-    MatrixXd b(2,2);
-    a << 1,2,
-         3,4;
-    b << 5,6,
-         7,8;
-    MatrixXd c = a.transpose() * b.inverse() * a;
-    MatrixXd d = a.transpose() * (b * a.inverse());
-    std::cout << c << std::endl << std::endl << d;
+double MahalDist(MatrixXd dx, MatrixXd K){
+    // d2 = dx' * inv(K) * dx;
+    double d2 = (dx.transpose() * K.inverse() * dx)(0,0);
+    return d2;
 }

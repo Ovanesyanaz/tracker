@@ -1,3 +1,8 @@
+#include <tuple>
+#include <vector>
+#include <Eigen/Dense>
+#include <iostream>
+using Eigen::MatrixXd;
 class Filter
 {
 public:

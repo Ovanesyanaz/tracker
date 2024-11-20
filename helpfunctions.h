@@ -66,4 +66,13 @@ MatrixXd col_index_eq(MatrixXd matrix, int64_t col, double value)
     return matrix;
 }
 
+MatrixXd getColsMatrix(MatrixXd m, std::vector<int> ind){
+     MatrixXd answ(m.rows(), ind.size());
+     int j = 0;
+     for (int i:ind){
+          answ.col(j) = m.col(i);
+          j = j + 1;
+     }
+     return answ;
+}
 // HELP FUNCTIONS
