@@ -1,110 +1,91 @@
 #include "ArrayController.h"
 
-using Eigen::MatrixXd;
-
-class ArrayController
+void ArrayController::Increment(int n) // добавить эелементы
 {
-private:
-    int capacity = 5;         // емкость по умолчанию
-    int free;                 // количество свободных элементов
-    int used;                 // количество использованных элементов
-    std::vector<int> list(5); // массив индексов
+    this->free = this->free - n;
+    this->used = this->used + n;
+}
 
-    void Increment(int n) // добавить эелементы
+ArrayController::ArrayController(int nTrackMax) : capacity(nTrackMax), free(nTrackMax), used(0), list(nTrackMax) {}
+
+std::vector<int> ArrayController::Allocate(int nNew)
+{
+
+    std::vector<int> idx(capacity);
+
+    if (this->used + nNew > this->capacity)
     {
-        this.free = this.free - n;
-        this.used = this.used + n;
-    }
-
-public:
-    ArrayController(nTrackMax)
-    {
-        this.capacity = nTrackMax;
-        this.free = this.capacity;
-        this.used = 0;
-        this.list.resize(0);
-        this.list.resize(capacity);
-    };
-
-    MatrixXd Allocate(int nNew)
-    {
-
-        std::vector<int> idx(capacity);
-
-        if (this.used + nNew > this.capacity)
-        {
-            std::cerr << "Can not allocate" << nNew << "objects";
-            idx.resize(0);
-            return;
-        }
-
-        int nNewCopy = nNew;
-        for (int i = 0; i < capacity; i++)
-        {
-            if (nNewCopy && this.list[i] == 0)
-            {
-                idx[i] = 1;
-                this.list[i] = 1;
-                nNewCopy--;
-            }
-        }
-
-        Increment(nNew);
+        std::cerr << "Can not allocate" << nNew << "objects";
+        idx.resize(0);
         return idx;
     }
 
-    MatrixXd Allocate()
+    int nNewCopy = nNew;
+    for (int i = 0; i < capacity; i++)
     {
-
-        int nNew = 1;
-        std::vector<int> idx(capacity);
-
-        if (this.used + nNew > this.capacity)
+        if (nNewCopy && this->list[i] == 0)
         {
-            std::cerr << "Can not allocate" << nNew << "objects";
-            idx.resize(0);
-            return;
+            idx[i] = 1;
+            this->list[i] = 1;
+            nNewCopy--;
         }
+    }
 
-        int nNewCopy = nNew;
-        for (int i = 0; i < capacity; i++)
-        {
-            if (nNewCopy && this.list[i] == 0)
-            {
-                idx[i] = 1;
-                this.list[i] = 1;
-                nNewCopy--;
-            }
-        }
+    Increment(nNew);
+    return idx;
+}
 
-        Increment(nNew);
+std::vector<int> ArrayController::Allocate()
+{
+
+    int nNew = 1;
+    std::vector<int> idx(capacity);
+
+    if (this->used + nNew > this->capacity)
+    {
+        std::cerr << "Can not allocate" << nNew << "objects";
+        idx.resize(0);
         return idx;
     }
 
-    void Deallocate(std::vector<int> idx) // в матлабе подается массив idx = {2 5 6}
+    int nNewCopy = nNew;
+    for (int i = 0; i < capacity; i++)
     {
-
-        int numel = std::accumulate(vec.begin(), vec.end(), 0LL);
-
-        if (!numel) // если в idx все 0
+        if (nNewCopy && this->list[i] == 0)
         {
-            return;
+            idx[i] = 1;
+            this->list[i] = 1;
+            nNewCopy--;
         }
-
-        if (idx.size() > this.capacity) // если количество элементов в idx больше capacity
-        {
-            std::cerr << "Can not delete " << numel << " objects" << std::endl;
-            exit(1);
-        }
-
-        for (int i = 0; i < capacity; i++)
-        {
-            if (dx[i] == 1)
-            {
-                this.list[i] = 0;
-            }
-        }
-
-        Increment(-numel);
     }
-};
+
+    Increment(nNew);
+    return idx;
+}
+
+void ArrayController::Deallocate(std::vector<int> idx) // в матлабе подается массив idx = {2 5 6}
+{
+
+    int numel = std::accumulate(idx.begin(), idx.end(), 0LL);
+
+    if (!numel) // если в idx все 0
+    {
+        return;
+    }
+
+    if (idx.size() > this->capacity) // если количество элементов в idx больше capacity
+    {
+        std::cerr << "Can not delete " << numel << " objects" << std::endl;
+        exit(1);
+    }
+
+    for (int i = 0; i < capacity; i++)
+    {
+        if (idx[i] == 1)
+        {
+            this->list[i] = 0;
+        }
+    }
+
+    Increment(-numel);
+}
