@@ -1,3 +1,6 @@
+#ifndef ARRAYCONTROLLER_H
+#define ARRAYCONTROLLER_H
+
 #include <vector>
 #include <iostream>
 #include <numeric>
@@ -19,3 +22,5 @@ public:
     std::vector<int> Allocate();
     void Deallocate(std::vector<int> idx); // удаление элемента
 };
+
+#endif // ARRAYCONTROLLER_H
