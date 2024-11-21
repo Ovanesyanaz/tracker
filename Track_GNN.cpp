@@ -6,7 +6,6 @@ class Track_GNN
 {
 private:
     int branchID = 0;
-    int trackID = 0;
     int nLost = 0;   
     int windowSize = 8;
     int measIDHist;
@@ -16,6 +15,7 @@ private:
     std::vector<double> histTime;
 public:    
     bool isConfirmed = false;
+    int trackID = 0;
     double score = -1;
     Track_GNN(){
         this->score = -1;

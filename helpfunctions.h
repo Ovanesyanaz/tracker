@@ -73,6 +73,6 @@ MatrixXd getColsMatrix(MatrixXd m, std::vector<int> ind){
           answ.col(j) = m.col(i);
           j = j + 1;
      }
-     return answ;
+     return answ.matrix();
 }
 // HELP FUNCTIONS

@@ -6,7 +6,6 @@ class Track_GNN
 {
 private:
     int branchID;
-    int trackID;
     int nLost;   
     int windowSize;
     int measIDHist;
@@ -17,6 +16,8 @@ private:
 public:
     MatrixXd vec();
     MatrixXd cov();
+    double tUpdate;
+    int trackID;
     double score;
     bool isConfirmed = false;
     Track_GNN(){
