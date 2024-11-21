@@ -1,11 +1,10 @@
-#pragma once
+#ifndef HELPFUNCTIONS_H
+#define HELPFUNCTIONS_H
+
 #include <Eigen/Dense>
-#include <iostream>
 #include <cmath>
 
 using Eigen::MatrixXd;
-
-// HELP FUNCTIONS
 
 std::vector<int64_t> find_indexes_rows_in_cols(MatrixXd matrix, Eigen::ArrayXd arr)
 {
@@ -66,13 +65,16 @@ MatrixXd col_index_eq(MatrixXd matrix, int64_t col, double value)
     return matrix;
 }
 
-MatrixXd getColsMatrix(MatrixXd m, std::vector<int> ind){
-     MatrixXd answ(m.rows(), ind.size());
-     int j = 0;
-     for (int i:ind){
-          answ.col(j) = m.col(i);
-          j = j + 1;
-     }
-     return answ.matrix();
+MatrixXd getColsMatrix(MatrixXd m, std::vector<int> ind)
+{
+    MatrixXd answ(m.rows(), ind.size());
+    int j = 0;
+    for (int i : ind)
+    {
+        answ.col(j) = m.col(i);
+        j = j + 1;
+    }
+    return answ;
 }
-// HELP FUNCTIONS
+
+#endif // HELPFUNCTIONS_H

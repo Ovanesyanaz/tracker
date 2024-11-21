@@ -1,12 +1,12 @@
 #include "ArrayController.h"
 
-void ArrayController::Increment(int n) // добавить эелементы
+ArrayController::ArrayController(int nTrackMax) : capacity(nTrackMax), free(nTrackMax), used(0), list(nTrackMax) {}
+
+void ArrayController::Increment(int n)
 {
     this->free = this->free - n;
     this->used = this->used + n;
 }
-
-ArrayController::ArrayController(int nTrackMax) : capacity(nTrackMax), free(nTrackMax), used(0), list(nTrackMax) {}
 
 std::vector<int> ArrayController::Allocate(int nNew)
 {
@@ -63,7 +63,7 @@ std::vector<int> ArrayController::Allocate()
     return idx;
 }
 
-void ArrayController::Deallocate(std::vector<int> idx) // в матлабе подается массив idx = {2 5 6}
+void ArrayController::Deallocate(std::vector<int> idx)
 {
 
     int numel = std::accumulate(idx.begin(), idx.end(), 0LL);

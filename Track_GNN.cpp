@@ -1,44 +1,33 @@
-#include "Filter.h"
-#include <vector>
-#include <Eigen/Dense>
-using Eigen::MatrixXd;
-class Track_GNN
+#include "Track_GNN.h"
+
+Track_GNN::Track_GNN()
 {
-private:
-    int branchID = 0;
-    int nLost = 0;   
-    int windowSize = 8;
-    int measIDHist;
-    int numHist = 250;
-    Filter filter;
-    std::vector<MatrixXd> hist;
-    std::vector<double> histTime;
-public:    
-    bool isConfirmed = false;
-    int trackID = 0;
-    double score = -1;
-    Track_GNN(){
-        this->score = -1;
-    };
-    void Predict(double t){
-        this->filter.Predict();
-    }
+    this->score = -1;
+}
 
-    MatrixXd vec(){
-        return this->filter.vec;
-    }
+void Track_GNN::Predict(double t)
+{
+    this->filter.Predict();
+}
 
-    MatrixXd cov(){
-        return this->filter.cov;
-    }
+MatrixXd Track_GNN::vec()
+{
+    return this->filter.vec;
+}
 
-    void FillHistory(){
-        this->hist.push_back(this->filter.vec);
-        this->histTime.push_back(this->filter.tUpd);
-    };
-    
-    void Update(MatrixXd meas){
-        this->filter.Update();
-        this->FillHistory();
-    };
-};
+MatrixXd Track_GNN::cov()
+{
+    return this->filter.cov;
+}
+
+void Track_GNN::FillHistory()
+{
+    this->hist.push_back(this->filter.vec);
+    this->histTime.push_back(this->filter.tUpd);
+}
+
+void Track_GNN::Update(MatrixXd meas)
+{
+    this->filter.Update();
+    this->FillHistory();
+}
