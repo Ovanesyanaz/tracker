@@ -22,3 +22,33 @@ std::tuple<MatrixXd, MatrixXd> GetMeasVector(std::vector<double> meas)
     y << meas[0];
     return {y, MatrixXd::Constant(2, 2, 0)};
 }
+
+std::tuple<double, double> SPRT_thresholds(double falseTrackConfirmProb, double trueTrackDeletionProb, double initScore)
+{
+    double t1, t2;
+    a = falseTrackConfirmProb;
+    b = trueTrackDeletionProb;
+
+    t1 = log(b / (1 - a)) + initScore;
+    t2 = log((1 - b) / a) + initScore;
+    return {t1, t2};
+}
+
+double ScoreIncrement(bool isTrackUpdated, double Pd, double betaFA, double M, double detS, double d2)
+{
+    double dLLR;
+    if (isTrackUpdated)
+    {
+        dLLR = log(Pd / betaFA / GaussPdfDenominator(M) / sqrt(detS)) - d2 / 2;
+        if (dLLR < 0)
+        {
+            std::cerr << "Score increment is negative" << std::endl;
+            exit(1);
+        }
+    }
+    else
+    {
+        dLLR = log(1 - Pd);
+    }
+    return dLLR;
+}
