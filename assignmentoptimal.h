@@ -1,3 +1,6 @@
+#ifndef ASSIGNMENTOPTIMAL_H
+#define ASSIGNMENTOPTIMAL_H
+
 #include "helpfunctions.h"
 
 std::pair<MatrixXd, double> assignmentoptimal(MatrixXd distMatrix);
@@ -17,3 +20,5 @@ MatrixXd step4(MatrixXd &, MatrixXd &, MatrixXd &,
 
 MatrixXd step5(MatrixXd &, MatrixXd &, MatrixXd &,
                MatrixXd &, MatrixXd &, int64_t);
+
+#endif // ASSIGNMENTOPTIMAL_H
