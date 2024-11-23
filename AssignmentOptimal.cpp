@@ -1,4 +1,3 @@
-#include <Eigen/Dense>
 #include "helpfunctions.h"
 
 using Eigen::MatrixXd;
