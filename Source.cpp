@@ -1,5 +1,5 @@
 #include "Source.h"
-
+#include <math.h>
 double MahalDist(MatrixXd dx, MatrixXd K)
 {
     // d2 = dx' * inv(K) * dx;
@@ -26,8 +26,8 @@ std::tuple<MatrixXd, MatrixXd> GetMeasVector(std::vector<double> meas)
 std::tuple<double, double> SPRT_thresholds(double falseTrackConfirmProb, double trueTrackDeletionProb, double initScore)
 {
     double t1, t2;
-    a = falseTrackConfirmProb;
-    b = trueTrackDeletionProb;
+    double a = falseTrackConfirmProb;
+    double b = trueTrackDeletionProb;
 
     t1 = log(b / (1 - a)) + initScore;
     t2 = log((1 - b) / a) + initScore;
@@ -39,7 +39,7 @@ double ScoreIncrement(bool isTrackUpdated, double Pd, double betaFA, double M, d
     double dLLR;
     if (isTrackUpdated)
     {
-        dLLR = log(Pd / betaFA / GaussPdfDenominator(M) / sqrt(detS)) - d2 / 2;
+        dLLR = log(Pd / betaFA / (pow((2 * 3.14), (M/2))) / sqrt(detS)) - d2 / 2;
         if (dLLR < 0)
         {
             std::cerr << "Score increment is negative" << std::endl;
