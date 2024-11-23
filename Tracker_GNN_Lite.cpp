@@ -1,10 +1,8 @@
 #include "Filter.h"
 #include "ArrayController.h"
-#include "MahalDist.h"
+#include "Source.h"
 #include "Track_GNN.h"
-#include "GetMeasVector.h"
 #include "ArrayController.h"
-#include "GetPredictedMeas.h"
 #include <vector>
 #include <Eigen/Dense>
 #include <limits>
@@ -48,7 +46,7 @@ private:
     std::vector<Track_GNN>tracks;
     // tracks
     // %track array controller
-    Tac tac;
+    ArrayController tac;
     // %initial track score
     double initScore;
     // %track score confirmation/deletion thresholds
