@@ -362,3 +362,10 @@ private:
         }
     }
 };
+
+int main(int argc, char const *argv[])
+{
+    Tracker_GNN_Lite Tracker;
+
+    return 0;
+}
