@@ -8,6 +8,7 @@
 #include <limits>
 #include "helpfunctions.h"
 #include "assignmentoptimal.h"
+#include "GatingThresholds.h"
 using Eigen::MatrixXd;
 class Tracker_GNN_Lite
 {
@@ -65,8 +66,6 @@ private:
         }
         // инициализируем tac
         this->tac = ArrayController();
-        // получаем пороги сробирования
-        this->gatingThreasholds = GatingThreasholds();
         // d2, detS, S
         MatrixXd d_2(nMeasMax, nTrackMax);
         this->d2 = d_2;
@@ -156,6 +155,7 @@ private:
             // D(this.d2(1:nMeas, 1:nTrk) > this.gatingThresholds(M)) = inf;  %measurement validation
             MatrixXd D = this->d2 + this->detS.array().log().matrix();
             // вычитание минимальной цены из соответсвующих столбцов
+
             // присвоение бесконечности
             for (int i = 0; i < D.cols(); i++)
             {
@@ -170,7 +170,7 @@ private:
                 for (int j = 0; j < D.rows(); j++)
                 {
                     D(j, i) = D(j, i) - min;
-                    if (D(j, i) > this->gatingThresholds(M))
+                    if (D(j, i) > GatingThresholds(this->Pg, 2))
                     {
                         D(j, i) = std::numeric_limits<double>::infinity();
                     }
@@ -264,8 +264,10 @@ private:
             }
             //---------------------------------------------------------------------------------------------
             // не понятная часть
-            this->tracks[iTr].measIDHist = Add(this.tracks[iTr].measIDHist, meases[im].id) this->tracks[iTr].nLost = 0;
-            this->tracks[iTr] = Update(this.tracks(iTr), meases[im]);
+            this->tracks[iTr].measIDHist.push_back(meases[im][4]);
+            //this->tracks[iTr].measIDHist = Add(this.tracks[iTr].measIDHist, meases[im].id);
+            this->tracks[iTr].nLost = 0;
+            this->tracks[iTr].Update(meases[im]);
             //---------------------------------------------------------------------------------------------
         }
 
@@ -297,13 +299,11 @@ private:
         {
             int iTr = this->tac.list[it];
             int M = 2;
-            double dLLR = ScoreIncrement(false, this->Pd, this->betaFA, M);
+            double dLLR = ScoreIncrement(false, this->Pd, this->betaFA, M, 0, 0);
             this->tracks[iTr].score = this->tracks[iTr].score + dLLR;
-            this->tracks[iTr].isConfirmed = (this->tracks[iTr].isConfirmed) || (this->tracks[iTr].score > this->T2);
-
-            this->tracks[iTr].measIDHist = Add(this.tracks[iTr].measIDHist, 0);
+            this->tracks[iTr].measIDHist.push_back(0);
             this->tracks[iTr].nLost = this->tracks[iTr].nLost + 1;
-            this->tracks[iTr] = FillHistory(this->tracks[iTr]);
+            this->tracks[iTr].FillHistory();
         }
         // инициаторы в котрые не попали отметки удаляем
         ind.clear();
@@ -323,31 +323,37 @@ private:
             }
         }
         // удаляем
+        std::vector<int> to_del;
         for (int i : ind)
         {
-            Deallocate(this->tac.list[i]);
+            to_del.push_back(i);
+            
         }
+        this->tac.Deallocate(to_del);
         // не присвоенные отметки создают траектории
         ind.clear();
         // индексы не присвоенных отметок
         for (int i = 0; i < nMeas; i++)
         {
-            if (!assignedMeasIdx)
+            if (!assignedMeasIdx[i])
             {
                 ind.push_back(i);
             }
         }
         for (int im : ind)
         {
-            int iTr = Allocate(this.tac);
+            std::vector<int> iTr_list = this->tac.Allocate();
             this->branchID = this->branchID + 1;
-            this->tracks[iTr].branchID = this->branchID;
-            this->tracks[iTr].score = this->initScore;
-            this->tracks[iTr].measIDHist = Reset(this->tracks[iTr].measIDHist);
-            this->tracks[iTr].measIDHist = Add(this->tracks[iTr].measIDHist, meases[im].id);
-            this->tracks[iTr].nLost = 0;
-            this->tracks[iTr] = Init(this->tracks[iTr], meases[im]);
+            for (int iTr:iTr_list){
+                this->tracks[iTr].branchID = this->branchID;
+                this->tracks[iTr].score = this->initScore;
+                this->tracks[iTr].Reset();
+                this->tracks[iTr].measIDHist.push_back(meases[im][4]);
+                this->tracks[iTr].nLost = 0;
+                this->tracks[iTr].Init(t,meases[im]);
+            }
         }
+        std::vector<int> ind_to_dealocate;
         for (int i : this->tac.list)
         {
             // удаление треков с маленьким счетом
@@ -357,15 +363,15 @@ private:
                 // удаление по прошедшему времени от последнего обновления
                 t - this->tracks[i].tUpdate >= this->tLostMax)
             {
-                Deallocate(this->tac, i);
+                ind_to_dealocate.push_back(i);
             }
+            this->tac.Deallocate(ind_to_dealocate);
+            ind_to_dealocate.clear();
         }
     }
 };
 
 int main(int argc, char const *argv[])
 {
-    Tracker_GNN_Lite Tracker;
-
-    return 0;
+    
 }
