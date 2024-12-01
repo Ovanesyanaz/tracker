@@ -1,9 +1,9 @@
 #ifndef ASSIGNMENTOPTIMAL_H
 #define ASSIGNMENTOPTIMAL_H
 
-#include "helpfunctions.h"
-
 #include <Eigen/Dense>
+using Eigen::MatrixXd;
+
 std::pair<MatrixXd, double> assignmentoptimal(MatrixXd distMatrix);
 
 MatrixXd buildassignmentvector(MatrixXd);

@@ -1,5 +1,6 @@
 #include "AssignmentOptimal.h"
 #include <Eigen/Dense>
+
 using Eigen::MatrixXd;
 
 MatrixXd step2(MatrixXd &, MatrixXd &, MatrixXd &,
