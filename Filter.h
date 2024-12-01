@@ -1,3 +1,5 @@
+#ifndef FILTER_H
+#define FILTER_H
 #include <tuple>
 #include <vector>
 #include <Eigen/Dense>
@@ -25,3 +27,4 @@ public:
     void Update(double t, std::vector<double> meas);
     void Construct();
 };
+#endif //FILTER_H

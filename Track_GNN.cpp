@@ -7,7 +7,7 @@ Track_GNN::Track_GNN()
 
 void Track_GNN::Predict(double t)
 {
-    this->filter.Predict();
+    this->filter.Predict(t);
 }
 
 MatrixXd Track_GNN::vec()
@@ -26,9 +26,9 @@ void Track_GNN::FillHistory()
     this->histTime.push_back(this->filter.tUpd);
 }
 
-void Track_GNN::Update(std::vector<double> meas)
+void Track_GNN::Update(double t, std::vector<double> meas)
 {
-    this->filter.Update();
+    this->filter.Update(t, meas);
     this->FillHistory();
 }
 
@@ -52,21 +52,6 @@ void Track_GNN::Reset()
     this->nLost = 0;
     this->isConfirmed = false;
 }
-
-    // function this = Init(this,t, meas)
-    //   %Initiate new track
-    //   this = Reset(this);
-      
-    //   %init tracking filter
-    //   if nargin == 3
-    //     this.filter = Init(this.filter,t, meas);
-    //   elseif nargin == 4
-    //     this.filter = Init(this.filter, meas, p2cVec, p2cMat);
-    //   end
-      
-    //   %add to hist
-    //   this = FillHistory(this);
-    // end
 
 void Track_GNN::Init(double t, std::vector<double>meas){
     this->Reset();

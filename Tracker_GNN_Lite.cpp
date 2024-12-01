@@ -7,7 +7,7 @@
 #include <Eigen/Dense>
 #include <limits>
 #include "helpfunctions.h"
-#include "assignmentoptimal.h"
+#include "AssignmentOptimal.h"
 #include "GatingThresholds.h"
 using Eigen::MatrixXd;
 class Tracker_GNN_Lite
@@ -56,7 +56,8 @@ private:
 
     // методы
     //  инициализация трекера
-    Tracker_GNN_Lite(Filter filter)
+public:
+    Tracker_GNN_Lite()
     {
         // заполняем массив track_array пустыми траекториями
         for (int i = 0; i < nTrackMax; i++)
@@ -75,7 +76,9 @@ private:
         // считаем начальный вес
         this->initScore = log(this->Pd * this->betaNT / this->betaFA);
         // пока не сделано !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        this->T1, this->T2 = 1, 2;
+        //const auto [y, R] = GetMeasVector(meases[i]);
+        const auto [buf1, buf2] = SPRT_thresholds(falseTrackConfirmProb, trueTrackDeletionProb, initScore);
+        this->T1, this->T2 = buf1, buf2;
     };
     // главный метод - обновление
     void Update(double t, std::vector<std::vector<double>> meases)
@@ -267,7 +270,7 @@ private:
             this->tracks[iTr].measIDHist.push_back(meases[im][4]);
             //this->tracks[iTr].measIDHist = Add(this.tracks[iTr].measIDHist, meases[im].id);
             this->tracks[iTr].nLost = 0;
-            this->tracks[iTr].Update(meases[im]);
+            this->tracks[iTr].Update(t, meases[im]);
             //---------------------------------------------------------------------------------------------
         }
 
@@ -373,5 +376,5 @@ private:
 
 int main(int argc, char const *argv[])
 {
-    
+    return 1;
 }

@@ -25,15 +25,13 @@ public:
     MatrixXd vec();
     MatrixXd cov();
     double tUpdate;
-    int trackID;
     double score;
     bool isConfirmed = false;
     Track_GNN();
     void Reset();
     void Predict(double t);
-    void Update(std::vector<double>);
+    void Update(double t, std::vector<double> meas);
     void FillHistory();
-    void Update(MatrixXd meas);
     void Init(double t,std::vector<double> meas);
 };
 

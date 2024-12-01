@@ -3,6 +3,7 @@
 
 #include "helpfunctions.h"
 
+#include <Eigen/Dense>
 std::pair<MatrixXd, double> assignmentoptimal(MatrixXd distMatrix);
 
 MatrixXd buildassignmentvector(MatrixXd);

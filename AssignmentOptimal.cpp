@@ -1,5 +1,5 @@
-#include "helpfunctions.h"
-
+#include "AssignmentOptimal.h"
+#include <Eigen/Dense>
 using Eigen::MatrixXd;
 
 MatrixXd step2(MatrixXd &, MatrixXd &, MatrixXd &,
@@ -16,6 +16,7 @@ double computeassignmentcost(MatrixXd &, MatrixXd, int64_t);
 MatrixXd step2(MatrixXd &distMatrix, MatrixXd &starMatrix, MatrixXd &primeMatrix,
                MatrixXd &coveredColumns, MatrixXd &coveredRows, int64_t minDim)
 // Возвращает assignment
+
 {
     MatrixXd assignment;
     // cover every column containing a starred zero

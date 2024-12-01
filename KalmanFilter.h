@@ -2,13 +2,6 @@
 #include <Eigen/Dense>
 using Eigen::MatrixXd;
 
-std::tuple<MatrixXd, MatrixXd> GetMeasVector(std::vector<double> meas)
-{
-    MatrixXd y(1, 1);
-    y << meas[0];
-    return {y, MatrixXd::Constant(2, 2, 0)};
-}
-
 std::tuple<MatrixXd, MatrixXd> KalmanFilter( MatrixXd& x_pred,
                                             MatrixXd& P_pred, 
                                             MatrixXd& H, 
