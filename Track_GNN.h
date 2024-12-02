@@ -12,12 +12,11 @@ class Track_GNN
 private:
     int windowSize;
     int numHist;
-    Filter filter;
     std::vector<MatrixXd> hist;
     std::vector<double> histTime;
 
 public:      
-
+    Filter filter;
     int nLost;  
     std::vector<int> measIDHist;
     int branchID;

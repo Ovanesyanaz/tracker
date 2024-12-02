@@ -2,6 +2,7 @@
 #include "ArrayController.h"
 #include "Source.h"
 #include "Track_GNN.h"
+#include "parser.h"
 #include "ArrayController.h"
 #include <vector>
 #include <Eigen/Dense>
@@ -56,6 +57,7 @@ public:
 
     // методы
     //  инициализация трекера
+
     Tracker_GNN_Lite()
     {
         // заполняем массив track_array пустыми траекториями
@@ -65,7 +67,7 @@ public:
             this->tracks.push_back(j);
         }
         // инициализируем tac
-        this->tac = ArrayController(nTrackMax);
+        this->tac = ArrayController();
         // d2, detS, S
         MatrixXd d_2(nMeasMax, nTrackMax);
         this->d2 = d_2;
@@ -81,6 +83,22 @@ public:
         this->T2 = buf2;
     };
     // главный метод - обновление
+
+    void Test(double t, std::vector<std::vector<double>> meases){
+        // кол-во траекторий и измерений
+        int nTrk = this->tac.used;
+        int nMeas = meases.size();
+        for (int i = 0; i < this->tac.list.size(); i++){
+            std::cout << this->tac.list[i] << " ";
+        }
+        // std::vector<int> list_of_track = this->tac.list;
+        // // для каждой существующей траетории делаем предикт
+        // for (int i : list_of_track)
+        // {
+        //     this->tracks[i].Predict(t);
+        // }
+    }
+
     void Update(double t, std::vector<std::vector<double>> meases)
     {
         // кол-во траекторий и измерений
@@ -145,17 +163,14 @@ public:
                     auto [z, H] = GetPredictedMeas(x);
                     MatrixXd dz = y - z;
                     // обновляем S
-                    //ТУТ ОШИБКА
-                    std::cout << P;
                     this->S[i][j] = H * P * H.transpose() + R;
                     // ищем расстояние
                     this->d2(i, j) = MahalDist(dz, S[i][j]);
                     // находим определитель S
                     this->detS(i, j) = S[i][j].determinant();
-                    //ТУТ КОНЕЦ ОШИБКИ
                 }
             }
-            
+
             // D = this.d2(1:nMeas, 1:nTrk) + log(this.detS(1:nMeas, 1:nTrk)); %log(|S|) is penalty for large covariance
             // D = D - min(D); %cost mat must be non-zero
             // D(this.d2(1:nMeas, 1:nTrk) > this.gatingThresholds(M)) = inf;  %measurement validation
@@ -380,7 +395,7 @@ public:
 int main(int argc, char const *argv[])
 {
     Tracker_GNN_Lite Tracker;
-    double t = 0.05;
+    double t = 0.5;
     std::vector<std::vector<double>> meases;
     meases = get_vec("/Users/arturoganesan/Documents/tracker/Marks.csv");
 
@@ -390,13 +405,5 @@ int main(int argc, char const *argv[])
     //     }
     //     std::cout << std::endl;
     // }
-    for(int i = 0; i < 10; i++){
-        std::vector<std::vector<double>> meas;
-        meas.push_back(meases[i]);
-        Tracker.Update(t, meas);
-        t += 0.05;
-        for (int j = 0; j < Tracker.tac.used; j++){
-        std::cout << Tracker.tracks[j].score << std::endl;
-        }
-    }
+    Tracker.Test(t, meases);
 }

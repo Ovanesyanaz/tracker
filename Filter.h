@@ -2,8 +2,8 @@
 #define FILTER_H
 #include <tuple>
 #include <vector>
-#include <Eigen/Dense>
 #include <iostream>
+#include <Eigen/Dense>
 using Eigen::MatrixXd;
 
 class Filter

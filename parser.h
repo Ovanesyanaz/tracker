@@ -59,6 +59,21 @@ void get_vector_of_vector_double(std::vector<std::vector<double>> &vec, std::str
     }
 }
 
+std::vector<std::vector<double>> get_vec(std::string filename){
+    std::ifstream file(filename);
+    CSVRow row;
+    std::vector<std::vector<double>> vec;
+    while(file >> row)
+    {
+        std::vector<double> buf;
+        for(int i = 0; i < row.size(); i++){
+            buf.push_back(std::stod(row[i]));
+        }
+        vec.push_back(buf);
+    }
+    return vec;
+}
+
 void vector_of_vector_double_to_csv(std::vector<std::vector<double>> data, std::string filename)
 {
     std::ofstream myfile;

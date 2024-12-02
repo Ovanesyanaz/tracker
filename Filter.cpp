@@ -39,8 +39,9 @@ void Filter::Update(double t, std::vector<double> meas){
 }
 
 void Filter::Init(double t, std::vector<double> meas){
-    this->vec(0) = meas[0];
-    this->vec(1) = meas[2];
+    this->Construct();
+    this->vec(0,0) = meas[0];
+    this->vec(1,0) = meas[2];
 
     this->cov(0,0) = meas[1] * meas[1];
     this->cov(1,1) = meas[3] * meas[3];

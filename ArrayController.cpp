@@ -1,6 +1,6 @@
 #include "ArrayController.h"
 
-ArrayController::ArrayController(int nTrackMax) : capacity(nTrackMax), free(nTrackMax), used(0), list(nTrackMax) {}
+ArrayController::ArrayController(int nTrackMax) : capacity(nTrackMax), free(nTrackMax), used(0), index(nTrackMax) {Getlist();}
 
 void ArrayController::Increment(int n)
 {
@@ -8,6 +8,14 @@ void ArrayController::Increment(int n)
     this->used = this->used + n;
 }
 
+void ArrayController::Getlist() {
+    this->list.resize(0);
+    for (int i = 0; i < this->capacity; i++) {
+        if (this->index[i] != 0) {
+            this->list.push_back(i);
+        }
+    }
+}
 std::vector<int> ArrayController::Allocate(int nNew)
 {
 
@@ -15,7 +23,7 @@ std::vector<int> ArrayController::Allocate(int nNew)
 
     if (this->used + nNew > this->capacity)
     {
-        std::cerr << "Can not allocate" << nNew << "objects";
+        std::cerr << "Can not allocate" << nNew << "objects" << std::endl;
         idx.resize(0);
         return idx;
     }
@@ -23,15 +31,16 @@ std::vector<int> ArrayController::Allocate(int nNew)
     int nNewCopy = nNew;
     for (int i = 0; i < capacity; i++)
     {
-        if (nNewCopy && this->list[i] == 0)
+        if (nNewCopy && this->index[i] == 0)
         {
             idx[i] = 1;
-            this->list[i] = 1;
+            this->index[i] = 1;
             nNewCopy--;
         }
     }
 
     Increment(nNew);
+    Getlist();
     return idx;
 }
 
@@ -51,15 +60,16 @@ std::vector<int> ArrayController::Allocate()
     int nNewCopy = nNew;
     for (int i = 0; i < capacity; i++)
     {
-        if (nNewCopy && this->list[i] == 0)
+        if (nNewCopy && this->index[i] == 0)
         {
             idx[i] = 1;
-            this->list[i] = 1;
+            this->index[i] = 1;
             nNewCopy--;
         }
     }
 
     Increment(nNew);
+    Getlist();
     return idx;
 }
 
@@ -81,11 +91,13 @@ void ArrayController::Deallocate(std::vector<int> idx)
 
     for (int i = 0; i < capacity; i++)
     {
-        if (idx[i] == 1)
+        if (idx[i] == 1 && this->index[i] == 1)
         {
-            this->list[i] = 0;
+            this->index[i] = 0;
         }
+        else {} // обработка ошибки при неправильном idx
     }
 
     Increment(-numel);
+    Getlist();
 }
