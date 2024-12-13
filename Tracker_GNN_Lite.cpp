@@ -68,10 +68,13 @@ public:
         this->tac = ArrayController(nTrackMax);
         // d2, detS, S
         MatrixXd d_2(nMeasMax, nTrackMax);
+        MatrixXd det_S(nMeasMax, nTrackMax);
         this->d2 = d_2;
-        this->detS = this->d2;
-        std::vector<std::vector<MatrixXd>> S_1;
-        this->S = S_1;
+        this->detS = det_S;
+        this->S.resize(10);
+        for(int i = 0; i < 10; i++){
+            S[i].resize(10);
+        }
         // считаем начальный вес
         this->initScore = log(this->Pd * this->betaNT / this->betaFA);
         // пока не сделано !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -136,7 +139,6 @@ public:
                 {
                     // индекс рассматриваемого трека
                     int iTr = this->tac.list[j];
-
                     // вектор и ков матрица траектории
                     MatrixXd x = this->tracks[iTr].vec();
                     MatrixXd P = this->tracks[iTr].cov();
@@ -145,14 +147,12 @@ public:
                     auto [z, H] = GetPredictedMeas(x);
                     MatrixXd dz = y - z;
                     // обновляем S
-                    //ТУТ ОШИБКА
-                    std::cout << P;
                     this->S[i][j] = H * P * H.transpose() + R;
+                    
                     // ищем расстояние
                     this->d2(i, j) = MahalDist(dz, S[i][j]);
-                    // находим определитель S
+                    // // находим определитель S
                     this->detS(i, j) = S[i][j].determinant();
-                    //ТУТ КОНЕЦ ОШИБКИ
                 }
             }
             
@@ -161,7 +161,6 @@ public:
             // D(this.d2(1:nMeas, 1:nTrk) > this.gatingThresholds(M)) = inf;  %measurement validation
             MatrixXd D = this->d2 + this->detS.array().log().matrix();
             // вычитание минимальной цены из соответсвующих столбцов
-
             // присвоение бесконечности
             for (int i = 0; i < D.cols(); i++)
             {
@@ -375,7 +374,28 @@ public:
             ind_to_dealocate.clear();
         }
     }
+    void test(){
+
+        int i = 0;
+        int j = 0;
+        // обновляем S
+        MatrixXd H(2,2);
+        H<<1,0,0,1;
+        MatrixXd P(2,2);
+        P<<4000,1,1,16;
+        MatrixXd R(2,2);
+        R << 4000,0,0,16;
+        MatrixXd dz(2,1);
+        dz << 86,0;
+        this->S[i][j] = (H * P * H.transpose()) + R;
+        // ищем расстояние
+        this->d2(i, j) = MahalDist(dz, S[i][j]);
+        // // находим определитель S
+        this->detS(i, j) = S[i][j].determinant();
+        std::cout << detS(i,j);
+}
 };
+
 
 int main(int argc, char const *argv[])
 {
@@ -383,20 +403,26 @@ int main(int argc, char const *argv[])
     double t = 0.05;
     std::vector<std::vector<double>> meases;
     meases = get_vec("/Users/arturoganesan/Documents/tracker/Marks.csv");
-
+    std::vector<std::vector<double>> meas;
+    meas.push_back(meases[0]);
+    Tracker.Update(t, meas);
+    std::cout <<"начальное значение score первой траектории - "<< Tracker.tracks[0].score << std::endl;
     // for(int i = 0; i < meases.size(); i++){
     //     for(int j = 0; j < meases[i].size(); j++){
     //         std::cout << meases[i][j] << " ";
     //     }
     //     std::cout << std::endl;
     // }
-    for(int i = 0; i < 10; i++){
-        std::vector<std::vector<double>> meas;
-        meas.push_back(meases[i]);
-        Tracker.Update(t, meas);
-        t += 0.05;
-        for (int j = 0; j < Tracker.tac.used; j++){
-        std::cout << Tracker.tracks[j].score << std::endl;
-        }
-    }
+    // for(int i = 0; i < 10; i++){
+    //     std::vector<std::vector<double>> meas;
+    //     meas.push_back(meases[i]);
+    //     Tracker.Update(t, meas);
+    //     t += 0.05;
+    //     for (int j = 0; j < Tracker.tac.used; j++){
+    //         std::cout << j << std::endl;
+    //         std::cout << Tracker.tracks[j].score << std::endl;
+    //     }
+    // }
+    // Tracker.test();
+    // std::cout << "allok";
 }

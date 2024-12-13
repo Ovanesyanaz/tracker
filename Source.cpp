@@ -9,17 +9,19 @@ double MahalDist(MatrixXd dx, MatrixXd K)
 
 std::tuple<MatrixXd, MatrixXd> GetPredictedMeas(MatrixXd x)
 {
-    MatrixXd z(1, 1);
-    z << x(0, 0);
-    MatrixXd H(1, 2);
-    H << 1, 0;
+    MatrixXd z(2, 1);
+    z << x(0, 0) + 1, x(1,0) + 2;
+    MatrixXd H(2, 2);
+    H << 1, 0, 0, 1;
     return {z, H};
 }
 
 std::tuple<MatrixXd, MatrixXd> GetMeasVector(std::vector<double> meas)
 {
-    MatrixXd y(1, 1);
-    y << meas[0];
+    MatrixXd y(2, 1);
+    y << meas[0], meas[1];
+    MatrixXd R{2,2};
+    R << 0,0,0,0;
     return {y, MatrixXd::Constant(2, 2, 0)};
 }
 
