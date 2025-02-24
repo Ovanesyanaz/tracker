@@ -10,9 +10,11 @@ void Filter::Predict(double t){
     double dt2 = dt*dt;
     this->Q(0,0) = dt*dt2 / 3;
     this->Q(0,1) = dt2/2;
+    this->Q(1,0) = this->Q(0,1);
     this->Q(1,1) = dt;
 
     this->vec = this->F * this->vec;
+
     this->cov = this->F * this->cov * this->F.transpose() + this->diffus * this->Q;
 }
 

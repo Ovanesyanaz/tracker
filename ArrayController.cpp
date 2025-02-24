@@ -27,11 +27,10 @@ std::vector<int> ArrayController::Allocate(int nNew)
         idx.resize(0);
         return idx;
     }
-
     int nNewCopy = nNew;
     for (int i = 0; i < capacity; i++)
     {
-        if (nNewCopy && this->index[i] == 0)
+        if ((nNewCopy > 0) and (this->index[i] == 0))
         {
             idx[i] = 1;
             this->index[i] = 1;
@@ -41,7 +40,13 @@ std::vector<int> ArrayController::Allocate(int nNew)
 
     Increment(nNew);
     Getlist();
-    return idx;
+    std::vector<int> ind;
+    for (int i = 0; i < idx.size(); i++){
+        if (idx[i] != 0){
+            ind.push_back(i);
+        }
+    }
+    return ind;
 }
 
 std::vector<int> ArrayController::Allocate()

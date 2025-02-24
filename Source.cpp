@@ -10,7 +10,7 @@ double MahalDist(MatrixXd dx, MatrixXd K)
 std::tuple<MatrixXd, MatrixXd> GetPredictedMeas(MatrixXd x)
 {
     MatrixXd z(2, 1);
-    z << x(0, 0) + 1, x(1,0) + 2;
+    z = x;
     MatrixXd H(2, 2);
     H << 1, 0, 0, 1;
     return {z, H};
@@ -19,10 +19,10 @@ std::tuple<MatrixXd, MatrixXd> GetPredictedMeas(MatrixXd x)
 std::tuple<MatrixXd, MatrixXd> GetMeasVector(std::vector<double> meas)
 {
     MatrixXd y(2, 1);
-    y << meas[0], meas[1];
+    y << meas[0], meas[2];
     MatrixXd R{2,2};
-    R << 0,0,0,0;
-    return {y, MatrixXd::Constant(2, 2, 0)};
+    R << meas[1] * meas[1],0,0,meas[3]*meas[3];
+    return {y, R};
 }
 
 std::tuple<double, double> SPRT_thresholds(double falseTrackConfirmProb, double trueTrackDeletionProb, double initScore)

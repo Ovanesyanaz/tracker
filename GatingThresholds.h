@@ -7,7 +7,7 @@
 
 double GatingThresholds(double Pg, int M){
     std::vector<std::vector<double>> GT;
-    get_vector_of_vector_double(GT, "GatingThresholds.csv");
+    get_vector_of_vector_double(GT, "/Users/arturoganesan/Documents/tracker/GatingThresholds.csv");
     int ind = Pg*1000;
     return GT[ind%100][M-1];        
 }
