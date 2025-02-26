@@ -380,7 +380,7 @@ int main(int argc, char const *argv[])
 
     double t = 0.05;
     std::vector<std::vector<double>> meases;
-    meases = get_vec("/Users/arturoganesan/Documents/tracker/Marks.csv");
+    meases = get_vec("../Marks.csv");
 
     for(int i = 0; i < 10; i ++){
         std::vector<std::vector<double>> meas;
