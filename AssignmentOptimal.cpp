@@ -220,7 +220,7 @@ MatrixXd buildassignmentvector(MatrixXd starMatrix)
         int64_t _, col;
         maxValueV(row, 0) = starMatrix.row(row).maxCoeff(&_, &col);
         if (maxValueV(row, 0) != 0)
-            assignment(row, 0) = col + 1; // индексация как в matlab
+            assignment(row, 0) = col + 1; // индексация как в matlab, делаем так, чтобы отличать от неприсвоеных
         else
             assignment(row, 0) = 0;
     }
@@ -230,8 +230,8 @@ MatrixXd buildassignmentvector(MatrixXd starMatrix)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 double computeassignmentcost(MatrixXd &assignment, MatrixXd distMatrix, int64_t nOfRows)
-/* Функция находит значения в матрице соответсвующие маске assignment, возвращает сумму конечных найденных значений,
-    при этом измеияет assignment: индесы которым соответствуют бесконечные значения заменяет значением 0*/
+/* Функция находит значения в матрице соответствующие маске assignment, возвращает сумму конечных найденных значений,
+    при этом изменяет assignment: индексы, которым соответствуют бесконечные значения заменяет значением 0*/
 {
     double cost = 0;
     for (int row = 0; row < nOfRows; row++)
